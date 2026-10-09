@@ -1,0 +1,12 @@
+{
+  "name": "tidy-tree",
+  "description": "tidy-tree: reorganize JS/TS codebases along their own architecture",
+  "owner": { "name": "Andres Gallego", "url": "https://github.com/andresfgzdev" },
+  "plugins": [
+    {
+      "name": "tidy-tree",
+      "source": "./",
+      "description": "Find and fix where code lives in JS/TS repositories, following each project's own architecture."
+    }
+  ]
+}

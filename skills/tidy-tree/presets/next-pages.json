@@ -1,0 +1,6 @@
+{
+  "entryPoints": ["pages/**", "{middleware,instrumentation,proxy}.{ts,js}"],
+  "neverMove": ["pages/**", "{middleware,instrumentation,proxy}.{ts,js}"],
+  "frameworkExports": ["getServerSideProps", "getStaticProps", "getStaticPaths", "getInitialProps", "config", "reportWebVitals", "middleware"],
+  "areaRoots": ["pages/*", "pages/api/*"]
+}

@@ -1,0 +1,9 @@
+{
+  "entryPoints": ["routes/**", "root.{tsx,jsx,ts,js}", "entry.{client,server}.{tsx,jsx,ts,js}", "routes.{ts,js}"],
+  "neverMove": ["routes/**", "root.{tsx,jsx,ts,js}", "entry.{client,server}.{tsx,jsx,ts,js}", "routes.{ts,js}"],
+  "frameworkExports": [
+    "loader", "action", "clientLoader", "clientAction", "meta", "links", "headers", "handle", "ErrorBoundary", "HydrateFallback",
+    "shouldRevalidate", "Layout", "middleware", "unstable_middleware"
+  ],
+  "areaRoots": ["routes/*"]
+}

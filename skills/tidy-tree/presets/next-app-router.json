@@ -1,0 +1,16 @@
+{
+  "entryPoints": [
+    "app/**/{page,layout,loading,error,not-found,template,default,route,global-error,global-not-found,forbidden,unauthorized,opengraph-image,twitter-image,icon,apple-icon,sitemap,robots,manifest}.{ts,tsx,js,jsx,mdx}",
+    "{middleware,instrumentation,instrumentation-client,proxy}.{ts,js}"
+  ],
+  "neverMove": [
+    "app/**/{page,layout,loading,error,not-found,template,default,route,global-error,global-not-found,forbidden,unauthorized,opengraph-image,twitter-image,icon,apple-icon,sitemap,robots,manifest}.{ts,tsx,js,jsx,mdx}",
+    "{middleware,instrumentation,instrumentation-client,proxy}.{ts,js}"
+  ],
+  "frameworkExports": [
+    "GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "runtime", "dynamic", "dynamicParams", "revalidate",
+    "fetchCache", "preferredRegion", "maxDuration", "metadata", "generateMetadata", "generateStaticParams", "viewport",
+    "generateViewport", "generateImageMetadata", "generateSitemaps", "alt", "size", "contentType", "config", "middleware", "proxy", "register"
+  ],
+  "areaRoots": ["app/*", "app/api/*"]
+}

@@ -1,0 +1,4 @@
+{
+  "entryPoints": ["{index,main,server,app,cli}.{ts,mts,cts,js,mjs,cjs}", "bin/**"],
+  "neverMove": ["bin/**"]
+}

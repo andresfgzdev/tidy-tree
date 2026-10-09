@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>tidy-tree review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+<style>
+:root {
+  --bg: #f4f5f7; --surface: #ffffff; --ink: #151a26; --muted: #5d6576; --line: #d9dde5; --soft: #eaedf2; --code: #eef0f4;
+  --accent: #2448c8; --accent-soft: #e2e8fb;
+  --good: #1d7a4b; --good-soft: #e0f2e8; --warn: #8f560a; --warn-soft: #fbefd9; --bad: #bf3329; --bad-soft: #fae6e4;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1320; --surface: #171c2b; --ink: #e5e8f0; --muted: #9aa2b5; --line: #2a3145; --soft: #1f2536; --code: #1b2131;
+    --accent: #8fa5ff; --accent-soft: #232c50;
+    --good: #5ccf96; --good-soft: #163428; --warn: #efb257; --warn-soft: #3a2c15; --bad: #ff7b6e; --bad-soft: #3b1d1c;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); padding: 0 16px; }
+main { max-width: 1040px; margin: 0 auto; padding-block: 40px 140px; display: flex; flex-direction: column; gap: 32px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h1 { font-size: clamp(28px, 4.5vw, 40px); line-height: 1.1; }
+h2 { font-size: 22px; }
+h3 { font-size: 20px; line-height: 1.25; }
+p { margin: 0; }
+code { font: 0.86em var(--mono); background: var(--code); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.eyebrow { font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+header { display: flex; flex-direction: column; gap: 14px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.stat { background: var(--surface); padding: 12px 14px; display: flex; flex-direction: column; }
+.stat b { font: 700 24px var(--display); font-variant-numeric: tabular-nums; }
+.stat span { font-size: 13px; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.toc { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 6px 20px; font-size: 14px; }
+.toc li { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line); }
+.toc .state { font: 600 11px var(--mono); margin-left: auto; color: var(--muted); }
+
+article { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 20px; }
+article[data-decision="approve"] { border-color: var(--good); box-shadow: inset 4px 0 0 var(--good); }
+article[data-decision="skip"] { opacity: .62; }
+article[data-decision="later"] { box-shadow: inset 4px 0 0 var(--warn); }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.badge { font: 600 11px var(--mono); letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; background: var(--soft); color: var(--muted); }
+.b-strong { background: var(--good-soft); color: var(--good); }
+.b-worth { background: var(--warn-soft); color: var(--warn); }
+.b-optional { background: var(--soft); color: var(--muted); }
+.b-risk-high { background: var(--bad-soft); color: var(--bad); }
+.b-risk-medium { background: var(--warn-soft); color: var(--warn); }
+.b-type { background: var(--accent-soft); color: var(--accent); }
+.b-basis-enforced, .b-basis-documented { background: var(--good-soft); color: var(--good); }
+.b-basis-observed { background: var(--accent-soft); color: var(--accent); }
+.b-basis-heuristic { background: var(--warn-soft); color: var(--warn); }
+.id { font: 600 13px var(--mono); color: var(--muted); }
+.files { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.files li { font: 12.5px var(--mono); background: var(--code); padding: 2px 8px; border-radius: 4px; overflow-wrap: anywhere; min-width: 0; }
+.evidence { display: flex; flex-wrap: wrap; gap: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; display: flex; flex-direction: column; min-width: 0; }
+.ev b { font: 700 18px var(--display); font-variant-numeric: tabular-nums; }
+.ev span { font-size: 12px; color: var(--muted); }
+
+.ba { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 760px) { .ba { grid-template-columns: minmax(0, 1fr); } }
+.pane { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; min-width: 0; display: flex; flex-direction: column; gap: 8px; overflow-x: auto; }
+.pane.after { border-color: var(--good); }
+.pane .eyebrow { font-size: 11px; }
+.pane.before .eyebrow { color: var(--bad); }
+.pane.after .eyebrow { color: var(--good); }
+.tree, .tree ul { list-style: none; margin: 0; padding: 0; font: 12.5px/1.75 var(--mono); }
+.tree ul { padding-left: 16px; border-left: 1px dashed var(--line); margin-left: 6px; }
+.tree .dir { color: var(--muted); }
+.tree .leaf { display: inline-flex; gap: 6px; align-items: baseline; padding: 0 6px; border-radius: 4px; white-space: nowrap; }
+.tree .note { font: 11px var(--body); color: var(--muted); white-space: normal; }
+.m-leaves { background: var(--bad-soft); color: var(--bad); text-decoration: line-through; text-decoration-thickness: 1px; }
+.m-gone { background: var(--bad-soft); color: var(--bad); text-decoration: line-through; }
+.m-grab { background: var(--warn-soft); color: var(--warn); font-weight: 600; }
+.m-tiny { background: var(--warn-soft); color: var(--warn); }
+.m-dup { background: var(--bad-soft); color: var(--bad); }
+.m-new { background: var(--good-soft); color: var(--good); font-weight: 600; }
+.m-dest { outline: 2px solid var(--good); color: var(--ink); }
+.m-keep { color: var(--ink); }
+.swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+.fan { display: flex; flex-direction: column; gap: 5px; }
+.fan-row { display: grid; grid-template-columns: minmax(90px, 200px) minmax(0, 1fr) 40px; gap: 8px; align-items: center; font: 12px var(--mono); }
+.fan-row .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.fan-track { height: 12px; background: var(--soft); border-radius: 3px; overflow: hidden; }
+.fan-fill { height: 100%; background: var(--accent); }
+.fan-row .val { text-align: right; font-variant-numeric: tabular-nums; }
+.codes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 760px) { .codes { grid-template-columns: minmax(0, 1fr); } }
+.codebox { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.codebox .t { font: 12px var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+pre { margin: 0; background: var(--code); border-radius: 6px; padding: 10px 12px; font: 12px/1.5 var(--mono); overflow-x: auto; }
+.mermaid-wrap { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; overflow-x: auto; }
+
+.prose { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px 14px; font-size: 14.5px; margin: 0; }
+.prose dt { font: 600 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+.prose dd { margin: 0; min-width: 0; }
+@media (max-width: 560px) { .prose { grid-template-columns: minmax(0, 1fr); gap: 2px; } .prose dd { margin-bottom: 8px; } }
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.chips li { font-size: 12.5px; border-radius: 999px; padding: 2px 10px; border: 1px solid var(--good); color: var(--good); }
+.chips.risk li { border-color: var(--warn); color: var(--warn); }
+details { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+summary { cursor: pointer; font: 500 13px var(--body); color: var(--muted); }
+details[open] summary { margin-bottom: 8px; }
+
+.decide { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; border-top: 1px solid var(--line); padding-top: 14px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { font: 500 13px var(--body); border: 0; background: var(--surface); color: var(--ink); padding: 7px 14px; cursor: pointer; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"][data-v="approve"] { background: var(--good); color: var(--surface); }
+.seg button[aria-pressed="true"][data-v="skip"] { background: var(--muted); color: var(--surface); }
+.seg button[aria-pressed="true"][data-v="later"] { background: var(--warn); color: var(--surface); }
+.decide textarea { flex: 1 1 280px; min-height: 38px; font: 14px var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; resize: vertical; }
+button:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+#top { background: var(--ink); color: var(--bg); border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 10px; }
+#top .eyebrow { color: var(--bg); opacity: .7; }
+#top a { color: var(--bg); }
+#top code { background: color-mix(in srgb, var(--bg) 18%, transparent); color: var(--bg); }
+
+.bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 10; }
+.bar-inner { max-width: 1040px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.bar .counts { font: 13px var(--mono); color: var(--muted); margin-right: auto; }
+.btn { font: 600 13px var(--body); border-radius: 8px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.toast { font-size: 13px; color: var(--good); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+</head>
+<body>
+<main id="app"></main>
+<div class="bar" role="region" aria-label="Decisions">
+  <div class="bar-inner">
+    <span class="counts" id="counts"></span>
+    <span class="toast" id="toast" role="status" aria-live="polite"></span>
+    <button class="btn" id="copy" type="button">Copy decisions</button>
+    <button class="btn primary" id="download" type="button">Download decisions.json</button>
+  </div>
+</div>
+
+<script id="report-data" type="application/json">
+__REPORT_JSON__
+</script>
+
+<script type="module">
+const REPORT = JSON.parse(document.getElementById("report-data").textContent);
+const KEY = `tidy-tree-decisions:${REPORT.id}`;
+const LABEL = { strong: "Strong", worth: "Worth doing", optional: "Optional" };
+const BASIS = { enforced: "enforced rule", documented: "documented convention", observed: "observed convention", heuristic: "heuristic only" };
+const TYPE = {
+  split: "split grab-bag", fold: "fold tiny file", "merge-duplicates": "merge duplicates", colocate: "colocate",
+  move: "move into domain folder", "remove-barrel": "remove barrel", "delete-dead": "delete dead code",
+  "standard-conflict": "standard conflict", rename: "rename",
+};
+const MARKS = {
+  grab: "grab-bag", tiny: "tiny file", dup: "duplicate", leaves: "moves out", gone: "deleted", new: "new file", dest: "destination", keep: "unchanged",
+};
+
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(decisions)); } catch {} };
+
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v === undefined || v === null || v === false) continue;
+    if (k === "class") n.className = v;
+    else if (k === "text") n.textContent = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v === true ? "" : v);
+  }
+  for (const kid of kids.flat()) if (kid !== null && kid !== undefined && kid !== false) n.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
+  return n;
+};
+
+function inline(text) {
+  const frag = document.createDocumentFragment();
+  String(text ?? "").split(/(`[^`]+`)/).forEach((part) => {
+    if (part.startsWith("`") && part.endsWith("`") && part.length > 1) frag.append(el("code", { text: part.slice(1, -1) }));
+    else frag.append(document.createTextNode(part));
+  });
+  return frag;
+}
+
+function tree(entries) {
+  const root = {};
+  for (const e of entries ?? []) {
+    const item = typeof e === "string" ? { path: e } : e;
+    const parts = item.path.split("/");
+    let node = root;
+    parts.forEach((p, i) => {
+      node.children ??= {};
+      node.children[p] ??= {};
+      node = node.children[p];
+      if (i === parts.length - 1) node.leaf = item;
+    });
+  }
+  const render = (node) => {
+    const ul = el("ul");
+    for (const [name, child] of Object.entries(node.children ?? {}).sort(([a, x], [b, y]) => Number(Boolean(x.leaf && !x.children)) - Number(Boolean(y.leaf && !y.children)) || a.localeCompare(b))) {
+      if (child.children && !child.leaf) ul.append(el("li", {}, el("span", { class: "dir", text: name + "/" }), render(child)));
+      else {
+        const m = child.leaf?.mark ?? "keep";
+        ul.append(el("li", {}, el("span", { class: `leaf m-${m}`, title: MARKS[m] ?? m, text: name }), child.leaf?.note ? el("span", { class: "note", text: "  " + child.leaf.note }) : null, child.children ? render(child) : null));
+      }
+    }
+    return ul;
+  };
+  const t = render(root);
+  t.className = "tree";
+  return t;
+}
+
+function fan(rows) {
+  const max = Math.max(1, ...rows.map((r) => r.count));
+  return el("div", { class: "fan" }, rows.map((r) =>
+    el("div", { class: "fan-row" },
+      el("span", { class: "lbl", title: r.area, text: r.area }),
+      el("div", { class: "fan-track" }, el("div", { class: "fan-fill", style: `width:${(100 * r.count) / max}%` })),
+      el("span", { class: "val", text: r.count }))));
+}
+
+function decisionControls(c) {
+  const state = decisions[c.id] ?? { decision: "undecided", comment: "" };
+  const article = () => document.getElementById(c.id);
+  const seg = el("div", { class: "seg", role: "group", "aria-label": `Decision for ${c.id}` });
+  for (const [v, label] of [["approve", "Approve"], ["later", "Later"], ["skip", "Skip"]]) {
+    seg.append(el("button", {
+      type: "button", "data-v": v, "aria-pressed": state.decision === v ? "true" : "false", text: label,
+      onclick: () => {
+        const cur = decisions[c.id] ?? { comment: "" };
+        cur.decision = cur.decision === v ? "undecided" : v;
+        decisions[c.id] = cur;
+        save();
+        seg.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.v === cur.decision ? "true" : "false"));
+        article().dataset.decision = cur.decision;
+        refresh();
+      },
+    }));
+  }
+  const ta = el("textarea", { id: `comment-${c.id}`, placeholder: "Notes for the agent (optional): a different destination, keep a re-export, split differently…", "aria-label": `Comment on ${c.id}` });
+  ta.value = state.comment ?? "";
+  ta.addEventListener("input", () => {
+    decisions[c.id] = { ...(decisions[c.id] ?? { decision: "undecided" }), comment: ta.value };
+    save();
+  });
+  return el("div", { class: "decide" }, seg, ta);
+}
+
+function card(c) {
+  const a = el("article", { id: c.id, "data-decision": decisions[c.id]?.decision ?? "undecided" });
+  a.append(
+    el("div", { class: "badges" },
+      el("span", { class: "id", text: c.id }),
+      el("span", { class: `badge b-${c.strength}`, text: LABEL[c.strength] ?? c.strength }),
+      el("span", { class: "badge b-type", text: TYPE[c.type] ?? c.type }),
+      c.risk ? el("span", { class: `badge b-risk-${c.risk}`, text: `${c.risk} risk` }) : null,
+      c.basis ? el("span", { class: `badge b-basis-${c.basis}`, title: "What backs this candidate", text: BASIS[c.basis] ?? c.basis }) : null),
+    el("h3", {}, inline(c.title)),
+  );
+  if (c.files?.length) a.append(el("ul", { class: "files" }, c.files.map((f) => el("li", { text: f }))));
+  if (c.evidence?.length) a.append(el("div", { class: "evidence" }, c.evidence.map((e) => el("div", { class: "ev" }, el("b", { text: e.value }), el("span", { text: e.label })))));
+  if (c.before || c.after) {
+    a.append(el("div", { class: "ba" },
+      el("div", { class: "pane before" }, el("span", { class: "eyebrow", text: c.before?.label ?? "Before" }), tree(c.before?.tree), c.before?.caption ? el("span", { class: "note muted" }, inline(c.before.caption)) : null),
+      el("div", { class: "pane after" }, el("span", { class: "eyebrow", text: c.after?.label ?? "After" }), tree(c.after?.tree), c.after?.caption ? el("span", { class: "note muted" }, inline(c.after.caption)) : null)));
+  }
+  if (c.fanIn?.length) a.append(el("div", { class: "pane" }, el("span", { class: "eyebrow", text: c.fanInLabel ?? "Who imports it, by area" }), fan(c.fanIn)));
+  if (c.code) a.append(el("div", { class: "codes" }, [c.code.left, c.code.right].filter(Boolean).map((s) => el("div", { class: "codebox" }, el("span", { class: "t", text: s.title }), el("pre", { text: s.code })))));
+  if (c.mermaid) a.append(el("div", { class: "mermaid-wrap" }, el("pre", { class: "mermaid", text: c.mermaid })));
+  const dl = el("dl", { class: "prose" });
+  for (const [k, v] of [["Problem", c.problem], ["Solution", c.solution], ["Why here", c.standard]]) if (v) dl.append(el("dt", { text: k }), el("dd", {}, inline(v)));
+  a.append(dl);
+  if (c.wins?.length) a.append(el("ul", { class: "chips" }, c.wins.map((w) => el("li", {}, inline(w)))));
+  if (c.risks?.length) a.append(el("ul", { class: "chips risk" }, c.risks.map((w) => el("li", {}, inline(w)))));
+  if (c.plan?.length || c.verify?.length) {
+    a.append(el("details", {}, el("summary", { text: "Execution plan" }),
+      c.plan?.length ? el("pre", { text: JSON.stringify(c.plan, null, 2) }) : null,
+      c.verify?.length ? el("pre", { text: c.verify.join("\n") }) : null));
+  }
+  a.append(decisionControls(c));
+  return a;
+}
+
+function payload() {
+  return {
+    reportId: REPORT.id,
+    scope: REPORT.scope,
+    decidedAt: new Date().toISOString(),
+    decisions: REPORT.candidates.map((c) => ({ id: c.id, title: c.title, decision: decisions[c.id]?.decision ?? "undecided", comment: decisions[c.id]?.comment ?? "" })),
+  };
+}
+
+function refresh() {
+  const p = payload().decisions;
+  const n = (d) => p.filter((x) => x.decision === d).length;
+  document.getElementById("counts").textContent = `${n("approve")} approved · ${n("later")} later · ${n("skip")} skipped · ${n("undecided")} undecided`;
+  document.querySelectorAll(".toc li").forEach((li) => {
+    const d = decisions[li.dataset.id]?.decision ?? "undecided";
+    li.querySelector(".state").textContent = d === "undecided" ? "" : d;
+  });
+}
+
+const app = document.getElementById("app");
+document.title = `tidy-tree review: ${REPORT.scope}`;
+app.append(
+  el("header", {},
+    el("span", { class: "eyebrow", text: `${REPORT.repo} · ${REPORT.scope} · ${REPORT.generatedAt?.slice(0, 10) ?? ""}` }),
+    el("h1", {}, inline(REPORT.headline ?? "Where files should live")),
+    REPORT.summary ? el("p", { class: "muted" }, inline(REPORT.summary)) : null,
+    el("div", { class: "stats" }, (REPORT.stats ?? []).map((s) => el("div", { class: "stat" }, el("b", { text: s.value }), el("span", { text: s.label })))),
+    el("div", { class: "legend" }, Object.entries(MARKS).filter(([k]) => k !== "keep").map(([k, v]) => el("span", {}, el("span", { class: `swatch m-${k}` }), v)))),
+  el("section", {}, el("h2", { text: "Candidates", style: "margin-bottom:12px" }),
+    el("ol", { class: "toc" }, REPORT.candidates.map((c) => el("li", { "data-id": c.id },
+      el("span", { class: `badge b-${c.strength}`, text: LABEL[c.strength] ?? c.strength }),
+      el("a", { href: `#${c.id}` }, `${c.id} `, inline(c.title)),
+      el("span", { class: "state" }))))),
+  ...REPORT.candidates.map(card),
+);
+if (REPORT.deferred?.length) {
+  app.append(el("section", {}, el("h2", { text: "Found, not in this report", style: "margin-bottom:8px" }),
+    el("p", { class: "muted", style: "margin-bottom:10px" }, "Real findings left out of the ranked list. Ask for any of them in a follow-up run."),
+    el("ul", { class: "files", style: "flex-direction:column;align-items:flex-start" }, REPORT.deferred.map((d) =>
+      el("li", { style: "font-family:var(--body);font-size:14px;background:transparent;padding:0" }, el("b", {}, inline(d.title)), d.reason ? el("span", { class: "muted" }, " · ", inline(d.reason)) : null)))));
+}
+if (REPORT.topRecommendation) {
+  const t = REPORT.topRecommendation;
+  app.append(el("section", { id: "top" }, el("span", { class: "eyebrow", text: "Top recommendation" }),
+    el("h2", {}, el("a", { href: `#${t.candidateId}` }, inline(t.title ?? t.candidateId))), el("p", {}, inline(t.why))));
+}
+refresh();
+
+const toast = (msg) => { const t = document.getElementById("toast"); t.textContent = msg; setTimeout(() => (t.textContent = ""), 3000); };
+document.getElementById("download").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(payload(), null, 2)], { type: "application/json" });
+  const a = el("a", { href: URL.createObjectURL(blob), download: `tidy-tree-decisions-${REPORT.id}.json` });
+  document.body.append(a); a.click(); a.remove();
+  toast("Saved to your downloads folder. Tell your agent you're done, or use Copy decisions.");
+});
+document.getElementById("copy").addEventListener("click", async () => {
+  const text = JSON.stringify(payload(), null, 2);
+  try { await navigator.clipboard.writeText(text); toast("Copied. Paste it into the chat."); }
+  catch { const ta = el("textarea"); ta.value = text; document.body.append(ta); ta.select(); document.execCommand("copy"); ta.remove(); toast("Copied. Paste it into the chat."); }
+});
+
+if (REPORT.candidates.some((c) => c.mermaid)) {
+  try {
+    const { default: mermaid } = await import("https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.esm.min.mjs");
+    const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+    mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "neutral", securityLevel: "strict", themeVariables: dark ? { edgeLabelBackground: "#1f2536" } : {} });
+    await mermaid.run({ querySelector: ".mermaid" });
+  } catch { document.querySelectorAll(".mermaid").forEach((n) => n.classList.add("muted")); }
+}
+</script>
+</body>
+</html>

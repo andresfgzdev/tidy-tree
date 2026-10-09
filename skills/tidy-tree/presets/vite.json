@@ -1,0 +1,4 @@
+{
+  "entryPoints": ["main.{ts,tsx,js,jsx}", "index.{ts,tsx,js,jsx}"],
+  "neverMove": ["main.{ts,tsx,js,jsx}"]
+}

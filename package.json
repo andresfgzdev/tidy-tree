@@ -1,0 +1,14 @@
+{
+  "name": "tidy-tree",
+  "private": true,
+  "description": "Agent skill that finds and fixes where code lives in JS/TS repositories, following each project's own architecture.",
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
