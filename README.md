@@ -1,6 +1,10 @@
 # tidy-tree
 
+[![test](https://github.com/andresfgzdev/tidy-tree/actions/workflows/test.yml/badge.svg)](https://github.com/andresfgzdev/tidy-tree/actions/workflows/test.yml) [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 An agent skill that finds and fixes **where code lives** in JavaScript and TypeScript repositories, by **your project's own architecture**, not someone else's.
+
+![The tidy-tree review: a headline finding, before and after folder trees, who imports the moving exports, and approve, later or skip for each candidate](docs/report.png)
 
 It looks for:
 - grab-bag files (`types/index.ts`, `utils.ts`, `constants.ts`) that every feature imports;
@@ -36,6 +40,8 @@ Every candidate says what backs it: an **enforced** rule, a **documented** conve
 /plugin install tidy-tree@tidy-tree
 ```
 
+Or add [all my skills](https://github.com/andresfgzdev/skills) at once with `/plugin marketplace add andresfgzdev/skills`, then `/plugin install tidy-tree@andresfgzdev`.
+
 **Any agent that reads Agent Skills** (Claude Code, Codex, Cursor, Copilot and others) via the [`skills`](https://github.com/vercel-labs/skills) CLI:
 
 ```bash
@@ -69,7 +75,7 @@ A run goes:
 - Imports are resolved with TypeScript's own module resolver, so `paths`, `baseUrl`, tsconfig `extends` and `references`, `package.json` `#imports` and NodeNext `.js` specifiers all work. Every rewritten import is checked to point at the intended file before anything is written.
 - **JS and TS only.** `.vue`, `.svelte` and `.astro` files are invisible to the import graph, and other languages' workspaces are listed as out of reach.
 - One root (workspace) per run. Monorepos are supported, but moves never cross a package boundary.
-- Tested on macOS and Linux. Windows paths should work but are untested.
+- Tested on macOS, Linux and Windows.
 
 ## Known limitations
 

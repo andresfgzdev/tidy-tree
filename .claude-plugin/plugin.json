@@ -1,7 +1,7 @@
 {
   "name": "tidy-tree",
   "displayName": "tidy-tree",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Finds and fixes where code lives in JS/TS repositories (grab-bag files, duplicates, misplaced and dead files, layer-crossing imports), following each project's own architecture. Interactive HTML review, then verified, import-safe moves.",
   "author": { "name": "Andres Gallego", "url": "https://github.com/andresfgzdev" },
   "homepage": "https://github.com/andresfgzdev/tidy-tree",

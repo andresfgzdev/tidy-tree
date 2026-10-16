@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Fix alias specifiers on Windows: moving `x.ts` to `x/index.ts` rewrote `@/x` to `@/x/index` because the index suffix was only stripped from POSIX paths.
+- Run the test suite on Windows in CI, and add a screenshot of the review to the README.
+
 ## 0.1.0
 
 First public release.
