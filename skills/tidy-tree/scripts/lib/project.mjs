@@ -340,7 +340,7 @@ export function toPosix(p) {
 const CODE_EXT = /\.(tsx?|jsx?|mjs|cjs|mts|cts)$/;
 
 export function aliasFor(absFile, aliases, preferPrefix) {
-  const noExt = absFile.replace(CODE_EXT, "").replace(/\/index$/, "");
+  const noExt = absFile.replace(CODE_EXT, "").replace(/[\\/]index$/, "");
   const covering = aliases
     .filter((a) => a.wildcard)
     .flatMap((a) => a.targets.map((t) => ({ a, t })))
